@@ -10,7 +10,7 @@ provider "aws" {
   access_key = var.use_localstack ? "mock" : null
   secret_key = var.use_localstack ? "mock" : null
 
-    dynamic "endpoints" {
+  dynamic "endpoints" {
     for_each = var.use_localstack ? [1] : []
     content {
       ec2        = "http://localhost:4566"
