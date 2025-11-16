@@ -16,7 +16,7 @@ jobs:
     environment: production  # requires approval
     permissions:
       id-token: write
-      contents: read
+      contents: write
 
     steps:
       - name: Checkout code
