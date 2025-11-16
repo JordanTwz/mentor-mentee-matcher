@@ -104,8 +104,14 @@ jobs:
           retention-days: 7
 
       # ---- Trigger apply or destroy ----
-      - name: Dispatch Apply/Destroy
-        uses: peter-evans/repository-dispatch@v3
+      - name: Call Apply Workflow
+        if: github.event.inputs.do_destroy != 'true'
+        uses: ./.github/workflows/terraform-apply.yml
         with:
-          event-type: ${{ github.event.inputs.do_destroy == 'true' && 'terraform-destroy' || 'terraform-apply' }}
-          client-payload: '{"plan_artifact": "${{ github.event.inputs.do_destroy == true && ''terraform-destroy-plan'' || ''terraform-plan'' }}", "ref": "${{ github.ref }}", "run_id": "${{ github.run_id }}"}'
+          plan_artifact: terraform-plan
+
+      - name: Call Destroy Workflow
+        if: github.event.inputs.do_destroy == 'true'
+        uses: ./.github/workflows/terraform-delete.yml
+        with:
+          plan_artifact: terraform-destroy-plan
