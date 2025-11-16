@@ -96,6 +96,7 @@ jobs:
 
       # ---- Upload plan artifact ----
       - name: Upload Plan
+        if: steps.plan.outcome == 'success' || (steps.lockcheck.outputs.lock_conflict == 'true' && github.event.inputs.release_stale_lock == 'true')
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.inputs.do_destroy == 'true' && 'terraform-destroy-plan' || 'terraform-plan' }}
