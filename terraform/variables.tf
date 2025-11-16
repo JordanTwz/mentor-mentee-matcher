@@ -1,0 +1,22 @@
+variable "aws_region" {
+    type = string
+    default = "ap-southeast-1"
+}
+
+variable "env" {
+    type = string
+    description = "Deployment environment (dev, staging, prod)"
+    default = "dev"
+}
+
+variable "app_name" {
+    type = string
+    description = "Application name"
+    default = "asp_proj"
+}
+
+variable "owner" {
+    type = string
+    description = "Team or person responsible for this infra"
+    default = "e-scholars"
+}
