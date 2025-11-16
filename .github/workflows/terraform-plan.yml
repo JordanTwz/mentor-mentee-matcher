@@ -108,4 +108,4 @@ jobs:
         uses: peter-evans/repository-dispatch@v3
         with:
           event-type: ${{ github.event.inputs.do_destroy == 'true' && 'terraform-destroy' || 'terraform-apply' }}
-          client-payload: '{"plan_artifact": "${{ github.event.inputs.do_destroy == true && ''terraform-destroy-plan'' || ''terraform-plan'' }}", "ref": "${{ github.ref }}"}'
+          client-payload: '{"plan_artifact": "${{ github.event.inputs.do_destroy == true && ''terraform-destroy-plan'' || ''terraform-plan'' }}", "ref": "${{ github.ref }}", "run_id": "${{ github.run_id }}"}'
