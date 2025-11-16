@@ -1,5 +1,5 @@
 output "vpc_id" {
-  value = aws_vpc.main.id
+  value       = aws_vpc.main.id
   description = "The ID of the created VPC."
 }
 
@@ -11,11 +11,11 @@ output "rtb_ids" {
 }
 
 output "public_subnet_ids" {
-  value = [for s in aws_subnet.public : s.id]
+  value       = [for s in aws_subnet.public : s.id]
   description = "The IDs of all public subnets"
 }
 
 output "igw_id" {
-  value = aws_internet_gateway.igw_main.id
+  value       = aws_internet_gateway.igw_main.id
   description = "The ID of the IGW"
 }

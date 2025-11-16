@@ -1,8 +1,8 @@
 terraform {
-    backend "s3" {
-        bucket = "asp-project-terraform-state"
-        key = "prod/root/terraform.tfstate"
-        region = "ap-southeast-1"
-        use_lockfile = true
-    }
+  backend "s3" {
+    bucket       = "asp-project-terraform-state"
+    key          = "prod/root/terraform.tfstate"
+    region       = "ap-southeast-1"
+    use_lockfile = true
+  }
 }
