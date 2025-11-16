@@ -26,7 +26,7 @@ fi
 
 # Plan with use_localstack=true
 echo "Running Terraform plan..."
-terraform plan -var="use_localstack=true" -out=tfplan
+terraform plan -var="use_localstack=true" -var="env=dev" -out=tfplan
 
 if [ $? -ne 0 ]; then
     echo "Terraform plan failed!"
@@ -35,7 +35,7 @@ fi
 
 # Apply with use_localstack=true
 echo "Applying Terraform..."
-terraform apply -var="use_localstack=true" tfplan
+terraform apply -var="use_localstack=true" -var="env=dev" tfplan
 
 if [ $? -eq 0 ]; then
     echo "Terraform apply completed successfully!"

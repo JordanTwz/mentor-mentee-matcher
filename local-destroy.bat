@@ -32,7 +32,7 @@ if %errorlevel% neq 0 (
 
 REM Destroy with use_localstack=true
 echo Running Terraform destroy...
-terraform destroy -var="use_localstack=true" -auto-approve
+terraform destroy -var="use_localstack=true" -var="env=dev" -auto-approve
 
 if %errorlevel% equ 0 (
     echo Terraform destroy completed successfully!

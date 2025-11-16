@@ -25,7 +25,7 @@ fi
 
 # Destroy with use_localstack=true
 echo "Running Terraform destroy..."
-terraform destroy -var="use_localstack=true" -auto-approve
+terraform destroy -var="use_localstack=true" -var="env=dev" -auto-approve
 
 if [ $? -eq 0 ]; then
     echo "Terraform destroy completed successfully!"

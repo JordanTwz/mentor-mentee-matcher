@@ -33,7 +33,7 @@ if %errorlevel% neq 0 (
 
 REM Plan with use_localstack=true
 echo Running Terraform plan...
-terraform plan -var="use_localstack=true" -out=tfplan
+terraform plan -var="use_localstack=true" -var="env=dev" -out=tfplan
 
 if %errorlevel% neq 0 (
     echo Terraform plan failed!
