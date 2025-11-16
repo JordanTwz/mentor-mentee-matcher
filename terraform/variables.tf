@@ -20,3 +20,9 @@ variable "owner" {
     description = "Team or person responsible for this infra"
     default = "e-scholars"
 }
+
+variable "use_localstack" {
+    type = bool
+    description = "Use LocalStack for local dev or actual (DEFAULT IS FALSE)"
+    default = false
+}
