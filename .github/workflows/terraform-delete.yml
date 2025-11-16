@@ -1,12 +1,8 @@
 name: Terraform Destroy
 
 on:
-  workflow_call:
-    inputs:
-      plan_artifact:
-        type: string
-        required: true
-        description: "Name of the destroy plan artifact to apply"
+  repository_dispatch:
+    types: [terraform-destroy]
   workflow_dispatch:
     inputs:
       plan_artifact:
@@ -25,6 +21,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.ref || github.ref }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -40,8 +38,10 @@ jobs:
       - name: Download Destroy Plan Artifact
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.plan_artifact }}
+          name: ${{ github.event.inputs.plan_artifact || github.event.client_payload.plan_artifact }}
           path: terraform/
+          run-id: ${{ github.event.client_payload.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Terraform Init
         working-directory: terraform
