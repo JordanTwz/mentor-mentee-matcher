@@ -12,6 +12,7 @@ module "alb" {
   tags       = local.global_tags
   env        = var.env
   app_name   = var.app_name
+  app_port   = var.app_port
   alb_subnets = [
     for key, subnet in local.public_subnets : subnet.id
     if contains(["a", "b"], key)
