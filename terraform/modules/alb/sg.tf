@@ -1,7 +1,7 @@
 
 resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
-  description = "Allows TLS inbound traffic to port 5000 of service (Flask endpoint)"
+  description = "Allows TLS inbound traffic from port 443"
   vpc_id      = var.vpc_id
 
   tags = merge(
