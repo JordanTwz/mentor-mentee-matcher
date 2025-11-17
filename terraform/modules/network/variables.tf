@@ -8,10 +8,19 @@ variable "vpc_cidr" {
 }
 
 variable "public_subnets" {
-  type = map(string)
+  type = map(object({
+    az   = string
+    cidr = string
+  }))
   default = {
-    "a" = "10.0.255.0/28",
-    "b" = "10.0.255.16/28"
+    a = {
+      az   = "a"
+      cidr = "10.0.255.0/28"
+    }
+    b = {
+      az   = "b"
+      cidr = "10.0.255.16/28"
+    }
   }
 }
 
