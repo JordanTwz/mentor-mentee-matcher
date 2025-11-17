@@ -1,4 +1,3 @@
-
 resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
   description = "Allows TLS inbound traffic from port 443"
