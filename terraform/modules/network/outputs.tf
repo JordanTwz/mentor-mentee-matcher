@@ -10,9 +10,14 @@ output "rtb_ids" {
   description = "The IDs of all route tables"
 }
 
-output "public_subnet_ids" {
-  value       = [for s in aws_subnet.public : s.id]
-  description = "The IDs of all public subnets"
+output "public_subnets" {
+  value = {
+    for key, subnet in aws_subnet.public : key => {
+      id = subnet.id
+      az = subnet.availability_zone
+    }
+  }
+  description = "Map of public subnet details by key"
 }
 
 output "igw_id" {
