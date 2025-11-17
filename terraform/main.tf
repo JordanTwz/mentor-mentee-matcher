@@ -21,3 +21,8 @@ module "alb" {
   is_localstack = var.use_localstack
   mock_acm_arn  = var.mock_acm_arn
 }
+
+module "ecr" {
+  source = "./modules/ecr"
+  tags   = local.global_tags
+}

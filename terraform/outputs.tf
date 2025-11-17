@@ -27,3 +27,8 @@ output "env" {
   value       = var.use_localstack ? "LocalStack" : "AWS"
   description = "Environment it is running on"
 }
+
+output "ecr_repository_url" {
+  value       = module.ecr.ecr_repository_url
+  description = "ECR Repository URL for Docker"
+}

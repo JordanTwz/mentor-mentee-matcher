@@ -25,6 +25,26 @@ if ([string]::IsNullOrWhiteSpace($certArn) -or $certArn -eq "None") {
 
 Write-Host "Certificate ARN: $certArn"
 
+# Fetch ECS Task Execution Role ARN from LocalStack
+Write-Host "Fetching ECS Task Execution Role ARN from LocalStack..."
+$ecsTaskExecutionRoleArn = docker exec localstack-main awslocal iam get-role --role-name ecsTaskExecutionRole --query 'Role.Arn' --output text
+
+if ([string]::IsNullOrWhiteSpace($ecsTaskExecutionRoleArn) -or $ecsTaskExecutionRoleArn -eq "None") {
+    throw "Failed to fetch ECS Task Execution Role ARN! Make sure LocalStack init.sh created the role."
+}
+
+Write-Host "ECS Task Execution Role ARN: $ecsTaskExecutionRoleArn"
+
+# Fetch ECS Instance Role ARN from LocalStack
+Write-Host "Fetching ECS Instance Role ARN from LocalStack..."
+$ecsInstanceRoleArn = docker exec localstack-main awslocal iam get-role --role-name ecsInstanceRole --query 'Role.Arn' --output text
+
+if ([string]::IsNullOrWhiteSpace($ecsInstanceRoleArn) -or $ecsInstanceRoleArn -eq "None") {
+    throw "Failed to fetch ECS Instance Role ARN! Make sure LocalStack init.sh created the role."
+}
+
+Write-Host "ECS Instance Role ARN: $ecsInstanceRoleArn"
+
 # Save current directory and navigate to terraform directory
 $originalDir = Get-Location
 try {
@@ -39,7 +59,15 @@ try {
 
     # Plan with use_localstack=true
     Write-Host "Running Terraform plan..."
-    terraform plan -var="use_localstack=true" -var="env=dev" -var="mock_acm_arn=$certArn" -out=tfplan
+    $planArgs = @(
+        "-var=use_localstack=true"
+        "-var=env=dev"
+        "-var=mock_acm_arn=$certArn"
+        "-var=mock_ecsTaskExecutionRoleARN=$ecsTaskExecutionRoleArn"
+        "-var=mock_ecsInstanceRoleARN=$ecsInstanceRoleArn"
+        "-out=tfplan"
+    )
+    terraform plan @planArgs
     if ($LASTEXITCODE -ne 0) {
         throw "Terraform plan failed!"
     }

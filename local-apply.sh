@@ -23,6 +23,28 @@ fi
 
 echo "Certificate ARN: $CERT_ARN"
 
+# Fetch ECS Task Execution Role ARN from LocalStack
+echo "Fetching ECS Task Execution Role ARN from LocalStack..."
+ECS_TASK_EXECUTION_ROLE_ARN=$(docker exec localstack-main awslocal iam get-role --role-name ecsTaskExecutionRole --query 'Role.Arn' --output text)
+
+if [ -z "$ECS_TASK_EXECUTION_ROLE_ARN" ] || [ "$ECS_TASK_EXECUTION_ROLE_ARN" = "None" ]; then
+    echo "Failed to fetch ECS Task Execution Role ARN! Make sure LocalStack init.sh created the role."
+    exit 1
+fi
+
+echo "ECS Task Execution Role ARN: $ECS_TASK_EXECUTION_ROLE_ARN"
+
+# Fetch ECS Instance Role ARN from LocalStack
+echo "Fetching ECS Instance Role ARN from LocalStack..."
+ECS_INSTANCE_ROLE_ARN=$(docker exec localstack-main awslocal iam get-role --role-name ecsInstanceRole --query 'Role.Arn' --output text)
+
+if [ -z "$ECS_INSTANCE_ROLE_ARN" ] || [ "$ECS_INSTANCE_ROLE_ARN" = "None" ]; then
+    echo "Failed to fetch ECS Instance Role ARN! Make sure LocalStack init.sh created the role."
+    exit 1
+fi
+
+echo "ECS Instance Role ARN: $ECS_INSTANCE_ROLE_ARN"
+
 # Navigate to terraform directory
 cd terraform
 
@@ -37,7 +59,13 @@ fi
 
 # Plan with use_localstack=true
 echo "Running Terraform plan..."
-terraform plan -var="use_localstack=true" -var="env=dev" -var="mock_acm_arn=$CERT_ARN" -out=tfplan
+terraform plan \
+    -var="use_localstack=true" \
+    -var="env=dev" \
+    -var="mock_acm_arn=$CERT_ARN" \
+    -var="mock_ecsTaskExecutionRoleARN=$ECS_TASK_EXECUTION_ROLE_ARN" \
+    -var="mock_ecsInstanceRoleARN=$ECS_INSTANCE_ROLE_ARN" \
+    -out=tfplan
 
 if [ $? -ne 0 ]; then
     echo "Terraform plan failed!"
