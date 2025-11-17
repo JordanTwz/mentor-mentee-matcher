@@ -18,7 +18,7 @@ if (-not $localstackRunning) {
 # Save current directory and navigate to terraform directory
 $originalDir = Get-Location
 try {
-    Set-Location $PSScriptRoot
+    Set-Location (Join-Path $PSScriptRoot "terraform")
 
     # Initialize Terraform with LocalStack backend
     Write-Host "Initializing Terraform with LocalStack backend..."

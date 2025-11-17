@@ -39,6 +39,16 @@ jobs:
         working-directory: terraform
         run: terraform init -input=false
 
+      # ---- Generate and display Terraform graph ----
+      - name: Generate Terraform Graph
+        working-directory: terraform
+        run: |
+          terraform graph > terraform-graph.dot
+          echo "### Terraform Dependency Graph" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat terraform-graph.dot >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
       # ---- Initial plan attempt ----
       - name: Terraform Plan Attempt
         id: plan
