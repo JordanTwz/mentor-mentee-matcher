@@ -34,6 +34,11 @@ variable "public_subnets" {
       az   = "b"
       cidr = "10.0.255.16/28"
     }
+    # c is for ECS
+    c = {
+      az   = "a"
+      cidr = "10.0.255.32/28"
+    }
   }
 }
 
