@@ -20,6 +20,7 @@ provider "aws" {
       cloudwatch = "http://localhost:4566"
       sts        = "http://localhost:4566"
       s3         = "http://localhost:4566"
+      elbv2      = "http://localhost:4566"
     }
   }
 }

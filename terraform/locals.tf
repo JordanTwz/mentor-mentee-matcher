@@ -6,4 +6,7 @@ locals {
     Owner         = var.owner
     ProvisionedBy = "ci-cd"
   }
+
+  public_subnets = element(concat(module.network_real.*.public_subnets, module.network_mock.*.public_subnets), 0)
 }
+
