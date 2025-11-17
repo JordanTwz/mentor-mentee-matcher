@@ -8,5 +8,7 @@ locals {
   }
 
   public_subnets = module.network.public_subnets
+
+  vpc_id = module.network.vpc_id
 }
 

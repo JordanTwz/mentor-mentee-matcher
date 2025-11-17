@@ -16,4 +16,5 @@ module "alb" {
     for key, subnet in local.public_subnets : subnet.id
     if contains(["a", "b"], key)
   ]
+  vpc_id = local.vpc_id
 }
