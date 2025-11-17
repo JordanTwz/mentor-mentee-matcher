@@ -21,3 +21,11 @@ variable "app_name" {
 variable "vpc_id" {
   type = string
 }
+
+variable "is_localstack" {
+  type = bool
+}
+
+variable "mock_acm_arn" {
+  type = string
+}

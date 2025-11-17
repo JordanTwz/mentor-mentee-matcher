@@ -8,4 +8,10 @@ awslocal s3api put-bucket-versioning \
   --bucket asp-proj-terraform-state \
   --versioning-configuration Status=Enabled
 
-echo "LocalStack initialization complete: S3 bucket 'asp-proj-terraform-state' created"
+# Create fake ACM certificate for ALB
+awslocal acm request-certificate \
+  --domain-name "*.example.com" \
+  --validation-method DNS \
+  --region ap-southeast-1
+
+echo "LocalStack initialization complete: S3 bucket 'asp-proj-terraform-state' created and ACM certificate requested"
