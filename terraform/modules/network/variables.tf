@@ -7,7 +7,6 @@ variable "vpc_cidr" {
   default = "10.0.255.0/24"
 }
 
-
 variable "aws_region" {
   type = string
 }
