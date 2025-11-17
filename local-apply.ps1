@@ -15,6 +15,16 @@ if (-not $localstackRunning) {
     Write-Host "LocalStack is already running."
 }
 
+# Fetch ACM certificate ARN from LocalStack
+Write-Host "Fetching ACM certificate ARN from LocalStack..."
+$certArn = docker exec localstack-main awslocal acm list-certificates --region ap-southeast-1 --query 'CertificateSummaryList[0].CertificateArn' --output text
+
+if ([string]::IsNullOrWhiteSpace($certArn) -or $certArn -eq "None") {
+    throw "Failed to fetch ACM certificate ARN! Make sure LocalStack init.sh created the certificate."
+}
+
+Write-Host "Certificate ARN: $certArn"
+
 # Save current directory and navigate to terraform directory
 $originalDir = Get-Location
 try {
@@ -29,7 +39,7 @@ try {
 
     # Plan with use_localstack=true
     Write-Host "Running Terraform plan..."
-    terraform plan -var="use_localstack=true" -var="env=dev" -out=tfplan
+    terraform plan -var="use_localstack=true" -var="env=dev" -var="mock_acm_arn=$certArn" -out=tfplan
     if ($LASTEXITCODE -ne 0) {
         throw "Terraform plan failed!"
     }

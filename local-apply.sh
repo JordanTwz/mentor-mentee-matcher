@@ -12,6 +12,17 @@ else
     echo "LocalStack is already running."
 fi
 
+# Fetch ACM certificate ARN from LocalStack
+echo "Fetching ACM certificate ARN from LocalStack..."
+CERT_ARN=$(docker exec localstack-main awslocal acm list-certificates --region ap-southeast-1 --query 'CertificateSummaryList[0].CertificateArn' --output text)
+
+if [ -z "$CERT_ARN" ] || [ "$CERT_ARN" = "None" ]; then
+    echo "Failed to fetch ACM certificate ARN! Make sure LocalStack init.sh created the certificate."
+    exit 1
+fi
+
+echo "Certificate ARN: $CERT_ARN"
+
 # Navigate to terraform directory
 cd terraform
 
@@ -26,7 +37,7 @@ fi
 
 # Plan with use_localstack=true
 echo "Running Terraform plan..."
-terraform plan -var="use_localstack=true" -var="env=dev" -out=tfplan
+terraform plan -var="use_localstack=true" -var="env=dev" -var="mock_acm_arn=$CERT_ARN" -out=tfplan
 
 if [ $? -ne 0 ]; then
     echo "Terraform plan failed!"

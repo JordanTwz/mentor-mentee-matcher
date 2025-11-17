@@ -26,3 +26,9 @@ variable "use_localstack" {
   description = "Use LocalStack for local dev or actual (DEFAULT IS FALSE)"
   default     = false
 }
+
+variable "mock_acm_arn" {
+  type        = string
+  description = "Mock ACM for LocalStack"
+  default     = ""
+}

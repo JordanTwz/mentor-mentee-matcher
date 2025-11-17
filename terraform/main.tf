@@ -17,4 +17,7 @@ module "alb" {
     if contains(["a", "b"], key)
   ]
   vpc_id = local.vpc_id
+
+  is_localstack = var.use_localstack
+  mock_acm_arn  = var.mock_acm_arn
 }
