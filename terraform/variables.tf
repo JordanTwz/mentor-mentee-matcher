@@ -44,6 +44,7 @@ variable "mock_ecsTaskExecutionRoleARN" {
   description = "Mock ARN for ecsTaskExecutionRole in LocalStack"
   default     = ""
 }
+
 variable "mock_ecsInstanceRoleARN" {
   type        = string
   description = "Mock ACM for ecsInstanceRole LocalStack"
