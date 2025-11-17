@@ -21,6 +21,12 @@ variable "owner" {
   default     = "e-scholars"
 }
 
+variable "app_port" {
+  type        = number
+  description = "Port app is listening at"
+  default     = 5000
+}
+
 variable "use_localstack" {
   type        = bool
   description = "Use LocalStack for local dev or actual (DEFAULT IS FALSE)"
