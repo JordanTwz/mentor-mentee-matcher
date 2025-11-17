@@ -23,6 +23,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install graph-easy
+        run: sudo apt-get update && sudo apt-get install -y libgraph-easy-perl
+
       - name: AWS OIDC Auth
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -44,9 +47,10 @@ jobs:
         working-directory: terraform
         run: |
           terraform graph > terraform-graph.dot
-          echo "### Terraform Dependency Graph" >> $GITHUB_STEP_SUMMARY
+          graph-easy terraform-graph.dot --as=ascii > terraform-graph.txt
+          echo "### Terraform Dependency Graph (ASCII)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat terraform-graph.dot >> $GITHUB_STEP_SUMMARY
+          cat terraform-graph.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
       # ---- Initial plan attempt ----
