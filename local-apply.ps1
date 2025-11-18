@@ -80,6 +80,44 @@ try {
     }
 
     Write-Host "Terraform apply completed successfully!"
+
+    # Generate infrastructure diagram with inframap
+    Write-Host "Generating infrastructure diagram..."
+    if (Get-Command inframap -ErrorAction SilentlyContinue) {
+        $imagesDir = Join-Path $PSScriptRoot ".images"
+        if (-not (Test-Path $imagesDir)) {
+            New-Item -ItemType Directory -Path $imagesDir | Out-Null
+        }
+        
+        # Pull state from LocalStack S3 bucket and pipe to temp file
+        Write-Host "Pulling Terraform state from LocalStack S3..."
+        $tempState = New-TemporaryFile
+        docker exec localstack-main awslocal s3 cp s3://asp-proj-terraform-state/prod/root/terraform.tfstate - | Out-File -FilePath $tempState -Encoding UTF8
+        
+        if ($LASTEXITCODE -eq 0 -and (Test-Path $tempState) -and (Get-Item $tempState).Length -gt 0) {
+            $fileSize = (Get-Item $tempState).Length
+            Write-Host "State file downloaded successfully ($fileSize bytes)"
+            inframap generate $tempState | Out-File -FilePath "$imagesDir\terraform-diagram.dot" -Encoding UTF8
+        } else {
+            Write-Host "Failed to download state from S3, skipping diagram generation"
+        }
+        
+        if ((Test-Path "$imagesDir\terraform-diagram.dot") -and (Get-Item "$imagesDir\terraform-diagram.dot").Length -gt 0) {
+            if (Get-Command dot -ErrorAction SilentlyContinue) {
+                dot -Tpng "$imagesDir\terraform-diagram.dot" -o "$imagesDir\terraform-diagram.png"
+                Write-Host "Infrastructure diagram saved to .images\terraform-diagram.png"
+            } else {
+                Write-Host "Graphviz not installed. Diagram saved as DOT file to .images\terraform-diagram.dot"
+                Write-Host "Install Graphviz to generate PNG: choco install graphviz"
+            }
+        }
+        
+        # Clean up temp state file
+        Remove-Item -Path $tempState -ErrorAction SilentlyContinue
+    } else {
+        Write-Host "inframap not found. Skipping diagram generation."
+        Write-Host "Install inframap: choco install inframap"
+    }
 }
 catch {
     Write-Host "Error: $_"

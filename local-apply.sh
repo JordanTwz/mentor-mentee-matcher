@@ -78,6 +78,40 @@ terraform apply -var="use_localstack=true" -var="env=dev" tfplan
 
 if [ $? -eq 0 ]; then
     echo "Terraform apply completed successfully!"
+    
+    # Generate infrastructure diagram with inframap
+    echo "Generating infrastructure diagram..."
+    if command -v inframap &> /dev/null; then
+        mkdir -p ../.images
+        
+        # Pull state from LocalStack S3 bucket and pipe to temp file
+        echo "Pulling Terraform state from LocalStack S3..."
+        TEMP_STATE=$(mktemp)
+        docker exec localstack-main awslocal s3 cp s3://asp-proj-terraform-state/prod/root/terraform.tfstate - > "$TEMP_STATE"
+        
+        if [ $? -eq 0 ] && [ -s "$TEMP_STATE" ]; then
+            echo "State file downloaded successfully ($(wc -c < "$TEMP_STATE") bytes)"
+            inframap generate "$TEMP_STATE" > ../.images/terraform-diagram.dot
+        else
+            echo "Failed to download state from S3, skipping diagram generation"
+        fi
+        
+        if [ -f ../.images/terraform-diagram.dot ] && [ -s ../.images/terraform-diagram.dot ]; then
+            if command -v dot &> /dev/null; then
+                dot -Tpng ../.images/terraform-diagram.dot -o ../.images/terraform-diagram.png
+                echo "Infrastructure diagram saved to .images/terraform-diagram.png"
+            else
+                echo "Graphviz not installed. Diagram saved as DOT file to .images/terraform-diagram.dot"
+                echo "Install Graphviz to generate PNG: apt-get install graphviz (or brew install graphviz)"
+            fi
+        fi
+        
+        # Clean up temp state file
+        rm -f "$TEMP_STATE"
+    else
+        echo "inframap not found. Skipping diagram generation."
+        echo "Install inframap from: https://github.com/cycloidio/inframap/releases"
+    fi
 else
     echo "Terraform apply failed!"
     exit 1

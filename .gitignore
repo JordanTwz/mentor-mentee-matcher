@@ -6,3 +6,4 @@ tfplan
 .venv
 venv
 .env
+.images
