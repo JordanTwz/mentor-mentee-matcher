@@ -2,10 +2,6 @@ variable "tags" {
   type = map(string)
 }
 
-variable "asg_subnets" {
-  type = list(string)
-}
-
 variable "aws_region" {
   type = string
 }
@@ -26,15 +22,7 @@ variable "app_port" {
   type = number
 }
 
-variable "alb_sg_id" {
-  type = string
-}
-
 variable "aws_az" {
-  type = string
-}
-
-variable "ecs_cluster_name" {
   type = string
 }
 
@@ -42,6 +30,6 @@ variable "is_localstack" {
   type = bool
 }
 
-variable "mock_ecsInstanceRoleARN" {
+variable "mock_ecsTaskExecutionRoleARN" {
   type = string
 }

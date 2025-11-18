@@ -32,3 +32,7 @@ output "ecr_repository_url" {
   value       = module.ecr.ecr_repository_url
   description = "ECR Repository URL for Docker"
 }
+
+output "ecs_cluster_name" {
+  value = module.ecs.ecs_cluster_name
+}
