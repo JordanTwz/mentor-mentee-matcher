@@ -11,5 +11,4 @@ resource "aws_autoscaling_group" "app" {
   }
 
   vpc_zone_identifier = var.asg_subnets
-  target_group_arns   = [aws_lb_target_group.default.arn]
 }
