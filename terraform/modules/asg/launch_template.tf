@@ -13,12 +13,12 @@ resource "aws_launch_template" "app" {
     }
   }
 
-  # user_data = base64encode(<<-EOF
-  #       #!/bin/bash
-  #       echo "ECS_CLUSTER=${var.ecs_cluster_name}" >> /etc/ecs/ecs.config
-  #       echo "ECS_ENABLE_CONTAINER_METADATA=true" >> /etc/ecs/ecs.config
-  #       EOF
-  # )
+  user_data = base64encode(<<-EOF
+        #!/bin/bash
+        echo "ECS_CLUSTER=${var.ecs_cluster_name}" >> /etc/ecs/ecs.config
+        echo "ECS_ENABLE_CONTAINER_METADATA=true" >> /etc/ecs/ecs.config
+        EOF
+  )
 
   iam_instance_profile {
     name = "ecsInstanceRole"

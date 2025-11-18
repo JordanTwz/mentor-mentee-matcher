@@ -9,7 +9,7 @@ locals {
 
   public_subnets   = module.network.public_subnets
   vpc_id           = module.network.vpc_id
-  aws_lb_tg_arn    = module.asg.asg_lb_tg_arn
+  aws_lb_tg_arn    = module.ecs.ecs_tg_arn
   ecs_cluster_name = module.ecs.ecs_cluster_name
 }
 
