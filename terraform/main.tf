@@ -40,10 +40,25 @@ module "asg" {
     for key, subnet in local.public_subnets : subnet.id
     if contains(["c"], key)
   ]
-  vpc_id    = local.vpc_id
-  alb_sg_id = module.alb.alb_sg_id
-  aws_az    = var.aws_az
+  vpc_id           = local.vpc_id
+  alb_sg_id        = module.alb.alb_sg_id
+  aws_az           = var.aws_az
+  ecs_cluster_name = local.ecs_cluster_name
 
   is_localstack           = var.use_localstack
   mock_ecsInstanceRoleARN = var.mock_ecsInstanceRoleARN
+}
+
+module "ecs" {
+  source     = "./modules/ecs"
+  aws_region = var.aws_region
+  tags       = local.global_tags
+  env        = var.env
+  app_name   = var.app_name
+  app_port   = var.app_port
+  vpc_id     = local.vpc_id
+  aws_az     = var.aws_az
+
+  is_localstack                = var.use_localstack
+  mock_ecsTaskExecutionRoleARN = var.mock_ecsTaskExecutionRoleARN
 }
