@@ -48,6 +48,9 @@ echo "ECS Instance Role ARN: $ECS_INSTANCE_ROLE_ARN"
 # Navigate to terraform directory
 cd terraform
 
+# Create logs directory
+mkdir -p ../.logs
+
 # Initialize Terraform with LocalStack backend
 echo "Initializing Terraform with LocalStack backend..."
 terraform init -backend-config=../localstack.config -reconfigure
@@ -57,9 +60,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Plan with use_localstack=true
-echo "Running Terraform plan..."
-terraform plan \
+# Plan with use_localstack=true and debug logging
+echo "Running Terraform plan with endpoint validation..."
+TF_LOG=DEBUG TF_LOG_PATH=../.logs/terraform-plan.log terraform plan \
     -var="use_localstack=true" \
     -var="env=dev" \
     -var="mock_acm_arn=$CERT_ARN" \
@@ -72,11 +75,33 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Apply with use_localstack=true
+# Validate all endpoints are LocalStack
+echo "Validating Terraform is using LocalStack endpoints..."
+if grep "amazonaws\.com" ../.logs/terraform-plan.log | grep -v "xmlns=" | grep -q "amazonaws\.com"; then
+    echo "ERROR: Terraform is trying to reach real AWS endpoints!"
+    echo "Found AWS API calls:"
+    grep "amazonaws\.com" ../.logs/terraform-plan.log | grep -v "xmlns=" | head -10
+    echo ""
+    echo "All API calls must go to localhost:4566 (LocalStack)"
+    exit 1
+fi
+
+if ! grep -q "localhost:4566" ../.logs/terraform-plan.log; then
+    echo "ERROR: No LocalStack endpoints found in Terraform logs!"
+    echo "Expected to find localhost:4566 in API calls"
+    exit 1
+fi
+
+echo "Endpoint validation passed - all calls going to LocalStack"
+
+# Apply with use_localstack=true and debug logging
 echo "Applying Terraform..."
-terraform apply -var="use_localstack=true" -var="env=dev" tfplan
+TF_LOG=DEBUG TF_LOG_PATH=../.logs/terraform-apply.log terraform apply -var="use_localstack=true" -var="env=dev" tfplan
 
 if [ $? -eq 0 ]; then
+    # Clean up plan file
+    rm -f tfplan
+    
     echo "Terraform apply completed successfully!"
     
     # Generate infrastructure diagram with inframap

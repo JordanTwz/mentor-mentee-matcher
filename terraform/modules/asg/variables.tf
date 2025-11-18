@@ -30,6 +30,10 @@ variable "alb_sg_id" {
   type = string
 }
 
+variable "aws_az" {
+  type = string
+}
+
 variable "is_localstack" {
   type = bool
 }
