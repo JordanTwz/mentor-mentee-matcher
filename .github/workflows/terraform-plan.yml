@@ -23,14 +23,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Graphviz and Inframap
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y graphviz
-          wget https://github.com/cycloidio/inframap/releases/download/v0.6.7/inframap-linux-amd64.tar.gz
-          tar -xzf inframap-linux-amd64.tar.gz
-          sudo mv inframap-linux-amd64 /usr/local/bin/inframap
-          sudo chmod +x /usr/local/bin/inframap
+      - name: Install graph-easy
+        run: sudo apt-get update && sudo apt-get install -y libgraph-easy-perl
 
       - name: AWS OIDC Auth
         uses: aws-actions/configure-aws-credentials@v4
@@ -48,23 +42,16 @@ jobs:
         working-directory: terraform
         run: terraform init -input=false
 
-      # ---- Generate and display infrastructure map ----
-      - name: Generate Infrastructure Map
+      # ---- Generate and display Terraform graph ----
+      - name: Generate Terraform Graph
         working-directory: terraform
         run: |
-          inframap generate . --raw | dot -Tpng > inframap.png
-          inframap generate . --raw | dot -Tsvg > inframap.svg
-          echo "### Infrastructure Resource Map" >> $GITHUB_STEP_SUMMARY
-          echo "![Infrastructure Map](inframap.svg)" >> $GITHUB_STEP_SUMMARY
-
-      - name: Upload Infrastructure Map
-        uses: actions/upload-artifact@v4
-        with:
-          name: infrastructure-map
-          path: |
-            terraform/inframap.png
-            terraform/inframap.svg
-          retention-days: 7
+          terraform graph > terraform-graph.dot
+          graph-easy terraform-graph.dot --as=ascii > terraform-graph.txt
+          echo "### Terraform Dependency Graph (ASCII)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat terraform-graph.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       # ---- Initial plan attempt ----
       - name: Terraform Plan Attempt
