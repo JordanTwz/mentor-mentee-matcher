@@ -7,3 +7,4 @@ tfplan
 venv
 .env
 .images
+.logs

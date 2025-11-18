@@ -3,6 +3,12 @@ variable "aws_region" {
   default = "ap-southeast-1"
 }
 
+variable "aws_az" {
+  type        = string
+  default     = "ap-southeast-1a"
+  description = "Default AZ for single AZ deploy"
+}
+
 variable "env" {
   type        = string
   description = "Deployment environment (dev, staging, prod)"

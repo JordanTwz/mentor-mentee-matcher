@@ -18,6 +18,7 @@ module "alb" {
     if contains(["a", "b"], key)
   ]
   vpc_id = local.vpc_id
+  tg_arn = local.aws_lb_tg_arn
 
   is_localstack = var.use_localstack
   mock_acm_arn  = var.mock_acm_arn
@@ -41,6 +42,7 @@ module "asg" {
   ]
   vpc_id    = local.vpc_id
   alb_sg_id = module.alb.alb_sg_id
+  aws_az    = var.aws_az
 
   is_localstack           = var.use_localstack
   mock_ecsInstanceRoleARN = var.mock_ecsInstanceRoleARN
