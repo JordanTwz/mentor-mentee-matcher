@@ -35,16 +35,6 @@ if ([string]::IsNullOrWhiteSpace($ecsTaskExecutionRoleArn) -or $ecsTaskExecution
 
 Write-Host "ECS Task Execution Role ARN: $ecsTaskExecutionRoleArn"
 
-# Fetch ECS Instance Role ARN from LocalStack
-Write-Host "Fetching ECS Instance Role ARN from LocalStack..."
-$ecsInstanceRoleArn = docker exec localstack-main awslocal iam get-role --role-name ecsInstanceRole --query 'Role.Arn' --output text
-
-if ([string]::IsNullOrWhiteSpace($ecsInstanceRoleArn) -or $ecsInstanceRoleArn -eq "None") {
-    throw "Failed to fetch ECS Instance Role ARN! Make sure LocalStack init.sh created the role."
-}
-
-Write-Host "ECS Instance Role ARN: $ecsInstanceRoleArn"
-
 # Save current directory and navigate to terraform directory
 $originalDir = Get-Location
 try {

@@ -45,5 +45,9 @@ resource "aws_launch_template" "app" {
     )
   }
 
+  network_interfaces {
+    associate_public_ip_address = true
+  }
+
   key_name = var.is_localstack ? null : "asp_proj"
 }

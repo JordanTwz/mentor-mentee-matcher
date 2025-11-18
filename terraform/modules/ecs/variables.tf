@@ -26,10 +26,27 @@ variable "aws_az" {
   type = string
 }
 
+variable "asg_arn" {
+  type = string
+}
+
+variable "tg_arn" {
+  type = string
+}
+
+variable "repository_url" {
+  type = string
+}
+
 variable "is_localstack" {
   type = bool
 }
 
 variable "mock_ecsTaskExecutionRoleARN" {
   type = string
+}
+
+variable "container_name" {
+  type    = string
+  default = "app"
 }
