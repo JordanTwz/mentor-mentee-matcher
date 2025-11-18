@@ -18,7 +18,6 @@ module "alb" {
     if contains(["a", "b"], key)
   ]
   vpc_id = local.vpc_id
-  tg_arn = local.aws_lb_tg_arn
 
   is_localstack = var.use_localstack
   mock_acm_arn  = var.mock_acm_arn
@@ -45,19 +44,21 @@ module "asg" {
   aws_az           = var.aws_az
   ecs_cluster_name = local.ecs_cluster_name
 
-  is_localstack           = var.use_localstack
-  mock_ecsInstanceRoleARN = var.mock_ecsInstanceRoleARN
+  is_localstack = var.use_localstack
 }
 
 module "ecs" {
-  source     = "./modules/ecs"
-  aws_region = var.aws_region
-  tags       = local.global_tags
-  env        = var.env
-  app_name   = var.app_name
-  app_port   = var.app_port
-  vpc_id     = local.vpc_id
-  aws_az     = var.aws_az
+  source         = "./modules/ecs"
+  aws_region     = var.aws_region
+  tags           = local.global_tags
+  env            = var.env
+  app_name       = var.app_name
+  app_port       = var.app_port
+  vpc_id         = local.vpc_id
+  aws_az         = var.aws_az
+  asg_arn        = local.aws_asg_arn
+  repository_url = local.repository_url
+  tg_arn         = local.aws_lb_tg_arn
 
   is_localstack                = var.use_localstack
   mock_ecsTaskExecutionRoleARN = var.mock_ecsTaskExecutionRoleARN

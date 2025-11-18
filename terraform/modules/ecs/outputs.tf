@@ -2,6 +2,10 @@ output "ecs_cluster_name" {
   value = aws_ecs_cluster.app.name
 }
 
-output "ecs_tg_arn" {
-  value = aws_lb_target_group.default.arn
+output "ecs_cluster_arn" {
+  value = aws_ecs_cluster.app.arn
+}
+
+output "ecs_service_arn" {
+  value = aws_ecs_service.app-service.arn
 }

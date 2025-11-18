@@ -41,7 +41,3 @@ variable "ecs_cluster_name" {
 variable "is_localstack" {
   type = bool
 }
-
-variable "mock_ecsInstanceRoleARN" {
-  type = string
-}
