@@ -14,6 +14,6 @@ output "alb_tg_arn" {
   value = aws_lb_target_group.default.arn
 }
 
-output "alb_listener" {
-  value = aws_lb_listener.default
+output "alb_listener_arn" {
+  value = aws_lb_listener.default.arn
 }

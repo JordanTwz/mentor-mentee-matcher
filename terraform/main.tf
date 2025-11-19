@@ -64,7 +64,7 @@ module "ecs" {
     for key, subnet in local.public_subnets : subnet.id
     if contains(["c"], key)
   ]
-  listener = local.listener
+  listener_arn = local.listener_arn
 
   is_localstack                = var.use_localstack
   mock_ecsTaskExecutionRoleARN = var.mock_ecsTaskExecutionRoleARN
