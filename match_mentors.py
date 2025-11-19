@@ -439,4 +439,4 @@ def download():
     return Response(buf, mimetype='text/csv', headers={'Content-Disposition':'attachment;filename=mentor_matches.csv'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0', port=5000)

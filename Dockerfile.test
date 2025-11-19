@@ -1,0 +1,15 @@
+FROM python:3.12-slim-bookworm
+
+WORKDIR /app
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY match_mentors.py ./
+
+ARG CACHE_BUST
+RUN echo "Cache bust: ${CACHE_BUST}"
+
+EXPOSE 5000
+
+CMD [ "python", "match_mentors.py" ]
