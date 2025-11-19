@@ -34,8 +34,6 @@ fi
 
 echo "ECS Task Execution Role ARN: $ECS_TASK_EXECUTION_ROLE_ARN"
 
-echo "ECS Instance Role ARN: $ECS_INSTANCE_ROLE_ARN"
-
 # Navigate to terraform directory
 cd terraform
 
