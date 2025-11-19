@@ -53,6 +53,13 @@ try {
         throw "Terraform init failed!"
     }
 
+    # Validate Terraform configuration
+    Write-Host "Validating Terraform configuration..."
+    terraform validate
+    if ($LASTEXITCODE -ne 0) {
+        throw "Terraform validation failed!"
+    }
+
     # Plan with use_localstack=true and debug logging
     Write-Host "Running Terraform plan with endpoint validation..."
     $env:TF_LOG = "DEBUG"
