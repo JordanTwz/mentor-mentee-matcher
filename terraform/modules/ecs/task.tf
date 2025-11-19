@@ -20,13 +20,6 @@ resource "aws_ecs_task_definition" "app-service" {
         containerPort = var.app_port
         hostPort      = 0
       }]
-      healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:${var.app_port}/health || exit 1"]
-        interval    = 10
-        timeout     = 5
-        retries     = 3
-        startPeriod = 10
-      }
 
       logConfiguration = {
         logDriver = "awslogs"
