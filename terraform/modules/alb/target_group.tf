@@ -16,4 +16,8 @@ resource "aws_lb_target_group" "default" {
     timeout             = 5
     path                = "/health"
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
