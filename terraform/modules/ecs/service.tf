@@ -9,9 +9,8 @@ resource "aws_ecs_service" "app-service" {
   force_new_deployment               = true
 
   network_configuration {
-    subnets          = var.task_subnets
-    security_groups  = [aws_security_group.ecs-task_sg.id]
-    assign_public_ip = true
+    subnets         = var.task_subnets
+    security_groups = [aws_security_group.ecs-task_sg.id]
   }
 
   load_balancer {
