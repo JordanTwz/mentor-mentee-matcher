@@ -1,8 +1,9 @@
 resource "aws_lb_target_group" "default" {
-  name     = "public-tg"
-  port     = var.app_port
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
+  name        = "public-tg"
+  port        = var.app_port
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "ip"
 
   deregistration_delay = 10
 

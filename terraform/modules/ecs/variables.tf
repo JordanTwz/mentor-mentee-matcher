@@ -30,6 +30,14 @@ variable "asg_arn" {
   type = string
 }
 
+variable "alb_sg_id" {
+  type = string
+}
+
+variable "task_subnets" {
+  type = list(string)
+}
+
 variable "tg_arn" {
   type = string
 }
