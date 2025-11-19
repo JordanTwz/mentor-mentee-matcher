@@ -42,8 +42,7 @@ variable "tg_arn" {
   type = string
 }
 
-variable "listener_arn" {
-  type = string
+variable "listener" {
 }
 
 variable "repository_url" {
