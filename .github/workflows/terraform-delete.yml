@@ -55,6 +55,7 @@ jobs:
             --desired-count 0 \
             --region ap-southeast-1
           echo "Scaled ECS service to 0 tasks"
+        continue-on-error: true
 
       - name: Wait for Tasks to Stop
         run: |
@@ -64,6 +65,7 @@ jobs:
             --services ${{ steps.get-ecs-info.outputs.service_name }} \
             --region ap-southeast-1
           echo "All tasks have stopped"
+        continue-on-error: true
 
       - name: Delete Images from ECR
         run: |
@@ -81,6 +83,7 @@ jobs:
               echo "No images found in $REPO"
             fi
           done
+        continue-on-error: true
 
       - name: Download Destroy Plan Artifact
         uses: actions/download-artifact@v4
