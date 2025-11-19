@@ -3,7 +3,7 @@ resource "aws_ecs_task_definition" "app-service" {
   requires_compatibilities = ["EC2"]
   cpu                      = 256
   memory                   = 512
-  network_mode             = "bridge"
+  network_mode             = "awsvpc" # Changed from "bridge"
   execution_role_arn       = var.is_localstack ? var.mock_ecsTaskExecutionRoleARN : "arn:aws:iam::368339042148:role/ecsTaskExecutionRole"
 
   container_definitions = jsonencode([
@@ -18,7 +18,8 @@ resource "aws_ecs_task_definition" "app-service" {
 
       portMappings = [{
         containerPort = var.app_port
-        hostPort      = 0
+        hostPort      = var.app_port
+        protocol      = "tcp"
       }]
 
       logConfiguration = {

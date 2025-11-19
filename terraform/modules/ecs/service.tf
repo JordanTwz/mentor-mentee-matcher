@@ -8,6 +8,12 @@ resource "aws_ecs_service" "app-service" {
   health_check_grace_period_seconds  = 30
   force_new_deployment               = true
 
+  network_configuration {
+    subnets          = var.task_subnets
+    security_groups  = [aws_security_group.ecs-task_sg.id]
+    assign_public_ip = true
+  }
+
   load_balancer {
     target_group_arn = var.tg_arn
     container_name   = var.container_name

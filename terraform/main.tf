@@ -59,6 +59,11 @@ module "ecs" {
   asg_arn        = local.aws_asg_arn
   repository_url = local.repository_url
   tg_arn         = local.aws_lb_tg_arn
+  alb_sg_id      = local.alb_sg_id
+  task_subnets = [
+    for key, subnet in local.public_subnets : subnet.id
+    if contains(["c"], key)
+  ]
 
   is_localstack                = var.use_localstack
   mock_ecsTaskExecutionRoleARN = var.mock_ecsTaskExecutionRoleARN

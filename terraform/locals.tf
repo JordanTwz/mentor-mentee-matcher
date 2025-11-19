@@ -13,5 +13,6 @@ locals {
   ecs_cluster_name = module.ecs.ecs_cluster_name
   aws_asg_arn      = module.asg.asg_arn
   repository_url   = module.ecr.ecr_repository_url
+  alb_sg_id        = module.alb.alb_sg_id
 }
 
