@@ -1,6 +1,6 @@
 resource "aws_launch_template" "app" {
   name          = "${var.env}-${var.app_name}-lt-"
-  image_id      = "ami-072b337bfb528c3c1"
+  image_id      = "ami-0796cd6a78caab345"
   instance_type = "t2.micro"
 
   block_device_mappings {
