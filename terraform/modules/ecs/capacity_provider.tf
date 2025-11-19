@@ -6,10 +6,7 @@ resource "aws_ecs_capacity_provider" "app_cp" {
     managed_termination_protection = "DISABLED"
 
     managed_scaling {
-      status                    = "ENABLED"
-      target_capacity           = 80
-      minimum_scaling_step_size = 1
-      maximum_scaling_step_size = 100
+      status = "DISABLED"
     }
   }
 }
