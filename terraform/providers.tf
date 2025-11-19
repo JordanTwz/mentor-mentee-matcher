@@ -13,15 +13,16 @@ provider "aws" {
   dynamic "endpoints" {
     for_each = var.use_localstack ? [1] : []
     content {
-      ec2         = "http://localhost:4566"
-      ecs         = "http://localhost:4566"
-      ecr         = "http://localhost:4566"
-      iam         = "http://localhost:4566"
-      cloudwatch  = "http://localhost:4566"
-      sts         = "http://localhost:4566"
-      s3          = "http://localhost:4566"
-      elbv2       = "http://localhost:4566"
-      autoscaling = "http://localhost:4566"
+      ec2            = "http://localhost:4566"
+      ecs            = "http://localhost:4566"
+      ecr            = "http://localhost:4566"
+      iam            = "http://localhost:4566"
+      sts            = "http://localhost:4566"
+      s3             = "http://localhost:4566"
+      elbv2          = "http://localhost:4566"
+      autoscaling    = "http://localhost:4566"
+      cloudwatchlogs = "http://localhost:4566"
+      acm            = "http://localhost:4566"
     }
   }
 }
