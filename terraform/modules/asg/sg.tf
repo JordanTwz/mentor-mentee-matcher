@@ -25,7 +25,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_ec2_instance_connect" {
   ip_protocol       = "tcp"
   from_port         = 22
   to_port           = 22
-  prefix_list_id    = data.aws_prefix_list.eic.id
+  prefix_list_id    = "pl-073f7512b7b9a2450"
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_traffic" {
