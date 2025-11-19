@@ -20,6 +20,14 @@ resource "aws_vpc_security_group_ingress_rule" "allow_https" {
   to_port                      = var.app_port
 }
 
+resource "aws_vpc_security_group_ingress_rule" "allow_ec2_instance_connect" {
+  security_group_id = aws_security_group.asg_sg.id
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+  prefix_list_id    = data.aws_prefix_list.eic.id
+}
+
 resource "aws_vpc_security_group_egress_rule" "allow_all_traffic" {
   security_group_id = aws_security_group.asg_sg.id
   cidr_ipv4         = "0.0.0.0/0"
