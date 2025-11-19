@@ -14,6 +14,5 @@ locals {
   aws_asg_arn      = module.asg.asg_arn
   repository_url   = module.ecr.ecr_repository_url
   alb_sg_id        = module.alb.alb_sg_id
-  listener_arn     = module.alb.alb_listener_arn
 }
 
