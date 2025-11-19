@@ -324,5 +324,9 @@ def download():
     buf = _last_df.to_csv(index=False)
     return Response(buf, mimetype='text/csv', headers={'Content-Disposition':'attachment;filename=mentor_matches.csv'})
 
+@app.route('/health')
+def health():
+    return {'status': 'healthy'}, 200
+
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5000)

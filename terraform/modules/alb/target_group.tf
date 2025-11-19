@@ -13,6 +13,6 @@ resource "aws_lb_target_group" "default" {
     unhealthy_threshold = 2
     port                = "traffic-port"
     timeout             = 5
-    path                = "/"
+    path                = "/health"
   }
 }
