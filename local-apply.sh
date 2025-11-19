@@ -51,6 +51,15 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Validate Terraform configuration
+echo "Validating Terraform configuration..."
+terraform validate
+
+if [ $? -ne 0 ]; then
+    echo "Terraform validation failed!"
+    exit 1
+fi
+
 # Plan with use_localstack=true and debug logging
 echo "Running Terraform plan with endpoint validation..."
 TF_LOG=DEBUG TF_LOG_PATH=../.logs/terraform-plan.log terraform plan \
