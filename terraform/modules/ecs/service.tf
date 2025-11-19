@@ -31,5 +31,5 @@ resource "aws_ecs_service" "app-service" {
 
   // ideally, we should not have this but we dont have blue-green so we must delete service
   // so that listener is not in use for TG to be modified
-  depends_on = [var.listener]
+  depends_on = [var.listener_arn]
 }
