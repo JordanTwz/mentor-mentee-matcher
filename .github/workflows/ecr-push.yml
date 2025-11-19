@@ -1,0 +1,66 @@
+name: Build and Deploy to ECS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::368339042148:role/github_deploy
+          aws-region: ap-southeast-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Get ECR repository name
+        id: get-ecr
+        run: |
+          ECR_REPO=$(aws ecr describe-repositories --query 'repositories[0].repositoryUri' --output text)
+          echo "ecr_repo=$ECR_REPO" >> $GITHUB_OUTPUT
+          echo "ECR Repository: $ECR_REPO"
+
+      - name: Get ECS cluster and service names
+        id: get-ecs
+        run: |
+          CLUSTER_ARN=$(aws ecs list-clusters --query 'clusterArns[0]' --output text)
+          CLUSTER_NAME=$(echo $CLUSTER_ARN | awk -F'/' '{print $NF}')
+          
+          SERVICE_ARN=$(aws ecs list-services --cluster $CLUSTER_NAME --query 'serviceArns[0]' --output text)
+          SERVICE_NAME=$(echo $SERVICE_ARN | awk -F'/' '{print $NF}')
+          
+          echo "cluster_name=$CLUSTER_NAME" >> $GITHUB_OUTPUT
+          echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+          echo "ECS Cluster: $CLUSTER_NAME"
+          echo "ECS Service: $SERVICE_NAME"
+
+      - name: Build and push Docker image
+        env:
+          ECR_REPO: ${{ steps.get-ecr.outputs.ecr_repo }}
+        run: |
+          docker build -t $ECR_REPO:latest .
+          docker push $ECR_REPO:latest
+
+      - name: Force new ECS deployment
+        env:
+          CLUSTER_NAME: ${{ steps.get-ecs.outputs.cluster_name }}
+          SERVICE_NAME: ${{ steps.get-ecs.outputs.service_name }}
+        run: |
+          aws ecs update-service \
+            --cluster $CLUSTER_NAME \
+            --service $SERVICE_NAME \
+            --force-new-deployment
+          
+          echo "Deployment initiated for $SERVICE_NAME in cluster $CLUSTER_NAME"

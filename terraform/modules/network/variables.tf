@@ -7,14 +7,6 @@ variable "vpc_cidr" {
   default = "10.0.255.0/24"
 }
 
-variable "public_subnets" {
-  type = map(string)
-  default = {
-    "a" = "10.0.255.0/28",
-    "b" = "10.0.255.16/28"
-  }
-}
-
 variable "aws_region" {
   type = string
 }
@@ -26,3 +18,27 @@ variable "env" {
 variable "app_name" {
   type = string
 }
+
+variable "public_subnets" {
+  type = map(object({
+    az   = string
+    cidr = string
+  }))
+  default = {
+    # a, b are for ALB subnets
+    a = {
+      az   = "a"
+      cidr = "10.0.255.0/28"
+    }
+    b = {
+      az   = "b"
+      cidr = "10.0.255.16/28"
+    }
+    # c is for ECS
+    c = {
+      az   = "a"
+      cidr = "10.0.255.32/28"
+    }
+  }
+}
+

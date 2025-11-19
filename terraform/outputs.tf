@@ -1,14 +1,42 @@
 output "vpc_id" {
-  value       = element(concat(module.network_real.*.vpc_id, module.network_mock.*.vpc_id), 0)
+  value       = module.network.vpc_id
   description = "The ID of the created VPC (real or mock)."
 }
 
 output "rtb_ids" {
-  value       = element(concat(module.network_real.*.rtb_ids, module.network_mock.*.rtb_ids), 0)
+  value       = module.network.*.rtb_ids
   description = "Route table IDs (real or mock)."
 }
 
-output "public_subnet_ids" {
-  value       = element(concat(module.network_real.*.public_subnet_ids, module.network_mock.*.public_subnet_ids), 0)
-  description = "Public subnet IDs (real or mock)."
+output "public_subnets" {
+  value       = module.network.*.public_subnets
+  description = "Public subnet (real or mock)."
+}
+
+output "alb_arn" {
+  value       = module.alb.alb_arn
+  description = "ARN of ALB"
+}
+
+output "alb_dns" {
+  value       = module.alb.alb_dns
+  description = "DNS of ALB"
+}
+
+output "env" {
+  value       = var.use_localstack ? "LocalStack" : "AWS"
+  description = "Environment it is running on"
+}
+
+output "ecr_repository_url" {
+  value       = module.ecr.ecr_repository_url
+  description = "ECR Repository URL for Docker"
+}
+
+output "ecs_cluster_arn" {
+  value = module.ecs.ecs_cluster_arn
+}
+
+output "ecs_service_arn" {
+  value = module.ecs.ecs_service_arn
 }

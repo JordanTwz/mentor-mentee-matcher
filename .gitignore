@@ -3,3 +3,8 @@
 *.tfstate
 *.tfstate.backup
 tfplan
+.venv
+venv
+.env
+.images
+.logs
