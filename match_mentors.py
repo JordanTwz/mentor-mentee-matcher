@@ -6,7 +6,7 @@ One-to-One Mentor–Mentee Matching with Drag-Drop Priority, Tooltips & Error Ha
 ----------------------------------------------------------------------------
 Industry fuzzy matching is now exact (threshold=0) to avoid unintended matches. Duplicate industry matches are removed.
 Usage:
-    python match_mentors_ui.py
+    python match_mentors.py
 Open http://127.0.0.1:5000/
 """
 
@@ -93,6 +93,7 @@ RESULT_HTML = """
 <head>
   <title>Matching Results</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="p-4">
   <h1>Matching Results</h1>
@@ -113,6 +114,7 @@ RESULT_HTML = """
     </select>
     <button class="btn btn-primary ms-2" onclick="sortTable()">Sort</button>
   </div>
+  <p class="text-muted">Click any result row to see its score breakdown.</p>
   <table id="resultsTable" class="table table-striped">
     <thead>
       <tr>
@@ -127,7 +129,7 @@ RESULT_HTML = """
     </thead>
     <tbody>
     {% for row in rows %}
-      <tr>
+      <tr data-breakdown='{{ row.ScoreBreakdown | tojson | safe }}'>
         <td>{{row.Mentee}}</td>
         <td>{{row.Mentor}}</td>
         <td>{{row.Score}}</td>
@@ -139,6 +141,35 @@ RESULT_HTML = """
     {% endfor %}
     </tbody>
   </table>
+
+  <div class="modal fade" id="breakdownModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="breakdownTitle">Score Breakdown</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Total Score: <strong id="breakdownTotal">0.00</strong></p>
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Points</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="breakdownBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Map select-option values to column indexes in the table
@@ -187,6 +218,57 @@ RESULT_HTML = """
       tbody.innerHTML = "";
       rows.forEach(row => tbody.appendChild(row));
     }
+    const breakdownModalEl = document.getElementById("breakdownModal");
+    const breakdownModal = breakdownModalEl ? new bootstrap.Modal(breakdownModalEl) : null;
+    const breakdownBody = document.getElementById("breakdownBody");
+    const breakdownTitle = document.getElementById("breakdownTitle");
+    const breakdownTotal = document.getElementById("breakdownTotal");
+    const breakdownConfig = [
+      { label: "Industry", pointsKey: "industry_points", detailsKey: "industry_details", isList: true },
+      { label: "Role", pointsKey: "role_points", detailsKey: "role_details", isList: false },
+      { label: "Interest", pointsKey: "interest_points", detailsKey: "interest_details", isList: true },
+      { label: "Keyword", pointsKey: "keyword_points", detailsKey: "keyword_details", isList: true }
+    ];
+
+    document.querySelectorAll("#resultsTable tbody tr").forEach(row => {
+      row.style.cursor = "pointer";
+      row.addEventListener("click", () => {
+        if (!breakdownModal) {
+          return;
+        }
+        const data = JSON.parse(row.dataset.breakdown || "{}");
+        breakdownTitle.textContent = `${row.cells[0].innerText.trim()} - ${row.cells[1].innerText.trim()}`;
+        breakdownTotal.textContent = Number(data.total || 0).toFixed(2);
+        breakdownBody.innerHTML = "";
+        breakdownConfig.forEach(cfg => {
+          const tr = document.createElement("tr");
+          const nameTd = document.createElement("td");
+          nameTd.textContent = cfg.label;
+          const pointsTd = document.createElement("td");
+          pointsTd.textContent = Number(data[cfg.pointsKey] || 0).toFixed(2);
+          const detailTd = document.createElement("td");
+          if (cfg.isList) {
+            const items = data[cfg.detailsKey] || [];
+            if (!items.length) {
+              detailTd.textContent = "None";
+            } else {
+              items.forEach(item => {
+                const div = document.createElement("div");
+                div.textContent = item;
+                detailTd.appendChild(div);
+              });
+            }
+          } else {
+            detailTd.textContent = data[cfg.detailsKey] || "None";
+          }
+          tr.appendChild(nameTd);
+          tr.appendChild(pointsTd);
+          tr.appendChild(detailTd);
+          breakdownBody.appendChild(tr);
+        });
+        breakdownModal.show();
+      });
+    });
   </script>
 </body>
 </html>
@@ -244,13 +326,11 @@ def compute_score(m,n,weights,th):
 
 def match_details(m,n,th):
     det = {'Industry_Matches': [], 'Role_Match': False, 'Interest_Overlap': [], 'Keyword_Overlap': []}
-    matched_inds = set()
     for rank,pref in enumerate(n['industries_pref'],1):
         if not pref: continue
         for ind in m['industries']:
-            if fuzzy_eq(pref,ind,0) and ind not in matched_inds:
+            if fuzzy_eq(pref,ind,0):
                 det['Industry_Matches'].append(f"{rank}:{ind}")
-                matched_inds.add(ind)
                 break
     det['Role_Match'] = bool(n['role'] and fuzzy_eq(n['role'],m['role'],th))
     seen = set()
@@ -264,6 +344,38 @@ def match_details(m,n,th):
             det['Keyword_Overlap'].append(kw)
             seen.add(kw)
     return det
+
+
+def score_breakdown(mentor_row, mentee_row, weights, th, details):
+    industry_points = 0.0
+    for rank, pref in enumerate(mentee_row['industries_pref'], 1):
+        if not pref:
+            continue
+        for ind in mentor_row['industries']:
+            if fuzzy_eq(pref, ind, 0):
+                industry_points += weights['industry'].get(rank, 0) * weights['priority_factor']['industry']
+                break
+
+    role_points = weights['priority_factor']['role'] if mentee_row['role'] and fuzzy_eq(mentee_row['role'], mentor_row['role'], th) else 0.0
+
+    interest_points = weights['priority_factor']['interest'] if set(mentee_row['interests']) & set(mentor_row['interests']) else 0.0
+
+    keyword_overlap = set(mentee_row['keywords']) & set(mentor_row['keywords'])
+    keyword_points = len(keyword_overlap) * weights['priority_factor']['keyword']
+
+    total = industry_points + role_points + interest_points + keyword_points
+
+    return {
+        'industry_points': round(industry_points, 2),
+        'industry_details': details['Industry_Matches'],
+        'role_points': round(role_points, 2),
+        'role_details': 'Match' if details['Role_Match'] else 'No match',
+        'interest_points': round(interest_points, 2),
+        'interest_details': details['Interest_Overlap'],
+        'keyword_points': round(keyword_points, 2),
+        'keyword_details': details['Keyword_Overlap'],
+        'total': round(total, 2)
+    }
 
 @app.route('/', methods=['GET'])
 def index(): return render_template_string(INDEX_HTML)
@@ -307,16 +419,18 @@ def match():
         if r < n_me and c < n_mn:
             m = mentors.iloc[c]; n = mentees.iloc[r]
             det = match_details(m, n, thresh)
+            score_value = round(M[r,c], 2)
             out.append({
                 'Mentee': n['UG_Full_Name'],
                 'Mentor': m['Mentor Name'],
-                'Score': round(M[r,c], 2),
+                'Score': score_value,
                 'Industry_Matches': ';'.join(det['Industry_Matches']),
                 'Role_Match': det['Role_Match'],
                 'Interest_Overlap': ';'.join(det['Interest_Overlap']),
-                'Keyword_Overlap': ';'.join(det['Keyword_Overlap'])
+                'Keyword_Overlap': ';'.join(det['Keyword_Overlap']),
+                'ScoreBreakdown': score_breakdown(m, n, weights, thresh, det)
             })
-    _last_df = pd.DataFrame(out)
+    _last_df = pd.DataFrame([{k: v for k, v in row.items() if k != 'ScoreBreakdown'} for row in out])
     return render_template_string(RESULT_HTML, rows=out)
 
 @app.route('/download')
@@ -325,4 +439,4 @@ def download():
     return Response(buf, mimetype='text/csv', headers={'Content-Disposition':'attachment;filename=mentor_matches.csv'})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
