@@ -24,8 +24,6 @@ resource "aws_launch_template" "app" {
     name = "ecsInstanceRole"
   }
 
-  vpc_security_group_ids = [aws_security_group.asg_sg.id]
-
   tags = merge(
     var.tags,
     {
@@ -47,6 +45,7 @@ resource "aws_launch_template" "app" {
 
   network_interfaces {
     associate_public_ip_address = true
+    security_groups             = [aws_security_group.asg_sg.id]
   }
 
   key_name = var.is_localstack ? null : "asp_proj"
